@@ -14,7 +14,7 @@ This application predicts the customer will purchase a package or not.
 
 CustomerID = st.text_input("CustomerID", "12345")
 Age = st.number_input("Age", 0, 100, 30)
-TypeofContact = st.selectbox("Type of Contact", ["Company Invited", "Self Inquiry", "Contact Prefered"])
+TypeofContact = st.selectbox("Type of Contact", ["Company Invited", "Self Inquiry"])
 CityTier = st.selectbox("City Tier", [1, 2, 3])
 DurationOfPitch = st.number_input("Duration of Pitch", 0, 100, 30)
 Occupation = st.selectbox("Occupation", ["Unemployed", "Student", "Working Professional"])

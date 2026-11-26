@@ -25,15 +25,15 @@ ProductPitched = st.selectbox("Product Pitched", ["Basic", "Standard", "Deluxe",
 PreferredPropertyStar = st.number_input("Preferred Property Star", 1, 5, 3)
 MaritalStatus = st.selectbox("Marital Status", ["Married", "Single", "Divorced"])
 NumberOfTrips = st.number_input("Number of Trips", 0, 10, 2)
-Passport = st.selectbox("Passport", ["1", "0"])
+Passport = st.selectbox("Passport", [1, 0])
 PitchSatisfactionScore = st.number_input("Pitch Satisfaction Score", 1, 5, 3)
-OwnCar = st.selectbox("Own Car", ["1", "0"])
+OwnCar = st.selectbox("Own Car", [1, 0])
 NumberOfChildrenVisiting = st.number_input("Number of Children Visiting", 0, 10, 2)
-MonthlyIncome = st.number_input("Monthly Income", 0, 100000, 50000)
 Designation = st.selectbox("Designation", ["Executive", "Manager", "Senior Manager", "AVP", "VP"])
+MonthlyIncome = st.number_input("Monthly Income", 0, 100000, 50000)
 
-input_data = pd.DataFrame([{
-    "CustomerID": CustomerID,
+raw_input = {
+    "CustomerID": int(CustomerID) if CustomerID.isdigit() else 0,
     "Age": Age,
     "TypeofContact": TypeofContact,
     "CityTier": CityTier,
@@ -52,7 +52,15 @@ input_data = pd.DataFrame([{
     "NumberOfChildrenVisiting": NumberOfChildrenVisiting,
     "Designation": Designation,
     "MonthlyIncome": MonthlyIncome
-}])
+}
+
+input_data = pd.DataFrame([raw_input])
+
+# Automatically match exact column names and order used during training
+if hasattr(model, "feature_names_in_"):
+    input_data = input_data[list(model.feature_names_in_)]
+else:
+    input_data = input_data.drop(columns=["CustomerID"])
 
 if st.button("Predict Product Purchase"):
     prediction = model.predict(input_data)[0]

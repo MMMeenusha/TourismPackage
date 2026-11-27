@@ -138,21 +138,36 @@ with mlflow.start_run():
         "test_f1_score": test_report["1"]["f1-score"]
     })
 
-    # Save the complete fitted pipeline
+    
+
+    from sklearn.pipeline import Pipeline
+
     model_path = "tourism_project/deployment/tourism_package_v1_0.joblib"
 
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
 
+    # Ensure we are saving the complete Pipeline
+    best_model = grid_search.best_estimator_
+
+    if not isinstance(best_model, Pipeline):
+        raise TypeError(
+          f"Expected Pipeline but got {type(best_model)}"
+        )
+
+    # Verify XGBoost is fitted
+    best_model.named_steps["xgbclassifier"].get_booster()
+
+    # Save complete Pipeline
     joblib.dump(best_model, model_path)
 
-    # Verify the saved model can be loaded and predicts
-    loaded_model = joblib.load(model_path)
-    loaded_model.predict(Xtest.head(5))
+    # Load again and verify
+    saved_model = joblib.load(model_path)
 
-    print("\nModel saved and verified successfully!")
-    print("Model type:", type(loaded_model))
-    print("Model steps:", loaded_model.named_steps.keys())
-    print("Model path:", model_path)
+    print("Saved model type:", type(saved_model))
+    print("Pipeline steps:", saved_model.named_steps.keys())
 
-    # Log model artifact
-    mlflow.log_artifact(model_path, artifact_path="model")
+    assert isinstance(saved_model, Pipeline)
+
+    saved_model.named_steps["xgbclassifier"].get_booster()
+
+    print("SUCCESS: Fitted Pipeline saved successfully!")

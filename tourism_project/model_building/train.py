@@ -144,30 +144,12 @@ with mlflow.start_run():
 
     model_path = "tourism_project/deployment/tourism_package_v1_0.joblib"
 
-    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    os.makedirs("tourism_project/deployment", exist_ok=True)
 
-    # Ensure we are saving the complete Pipeline
-    best_model = grid_search.best_estimator_
+    # Fitted preprocessor (scaler + one-hot encoder), saved with joblib
+    joblib.dump(best_model.named_steps["columntransformer"],
+            model_path)
 
-    if not isinstance(best_model, Pipeline):
-        raise TypeError(
-          f"Expected Pipeline but got {type(best_model)}"
-        )
-
-    # Verify XGBoost is fitted
-    best_model.named_steps["xgbclassifier"].get_booster()
-
-    # Save complete Pipeline
-    joblib.dump(best_model, model_path)
-
-    # Load again and verify
-    saved_model = joblib.load(model_path)
-
-    print("Saved model type:", type(saved_model))
-    print("Pipeline steps:", saved_model.named_steps.keys())
-
-    assert isinstance(saved_model, Pipeline)
-
-    saved_model.named_steps["xgbclassifier"].get_booster()
-
-    print("SUCCESS: Fitted Pipeline saved successfully!")
+    # XGBoost model, saved in native JSON format
+    best_model.named_steps["xgbclassifier"].save_model(
+        "tourism_project/deployment/xgb_model.json")

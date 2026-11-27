@@ -2,10 +2,19 @@ import os
 import streamlit as st
 import pandas as pd
 import joblib
+import xgboost as xgb
+
+model_path = "tourism_project/deployment/tourism_package_v1_0.joblib"
+base = os.path.dirname(__file__)
+preprocessor = joblib.load(os.path.join(base, "tourism_package_v1_0.joblib"))
+model = xgb.XGBClassifier()
+model.load_model(os.path.join(base, "xgb_model.json"))
+
+
 
 # Load the model committed by the pipeline (sits next to this file)
-model_path = os.path.join(os.path.dirname(__file__), "tourism_package_v1_0.joblib")
-model = joblib.load(model_path)
+#model_path = os.path.join(os.path.dirname(__file__), "tourism_package_v1_0.joblib")
+#model = joblib.load(model_path)
 
 st.title("Tourism Package App")
 st.write("""
@@ -56,14 +65,24 @@ raw_input = {
 
 input_data = pd.DataFrame([raw_input])
 
+# column order the preprocessor was fitted with
+input_data = input_data[list(preprocessor.feature_names_in_)]
+
 # Automatically match exact column names and order used during training
-if hasattr(model, "feature_names_in_"):
-    input_data = input_data[list(model.feature_names_in_)]
-else:
-    input_data = input_data.drop(columns=["CustomerID"])
+#if hasattr(model, "feature_names_in_"):
+#    input_data = input_data[list(model.feature_names_in_)]
+#else:
+#    input_data = input_data.drop(columns=["CustomerID"])
+
+#if st.button("Predict Product Purchase"):
+  #  prediction = model.predict(input_data)[0]
+   # result = "Product Taken" if prediction == 1 else "Product Not Taken"
+    #st.subheader("Prediction Result:")
+    #st.success(f"The model predicts: **{result}**")
 
 if st.button("Predict Product Purchase"):
-    prediction = model.predict(input_data)[0]
+    proba = model.predict_proba(preprocessor.transform(input_data))[0, 1]
+    prediction = int(proba >= 0.5)
     result = "Product Taken" if prediction == 1 else "Product Not Taken"
     st.subheader("Prediction Result:")
-    st.success(f"The model predicts: **{result}**")
+    st.success(f"The model predicts: **{result}** (probability {proba:.2f})")    

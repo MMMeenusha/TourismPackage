@@ -114,6 +114,8 @@ if st.button("Predict Product Purchase"):
 
     st.subheader("Prediction Result")
     if prediction == 1:
-        st.success(f"Product Taken: the customer is likely to purchase (probability {probability:.1%}).")
+        #st.success(f"Product Taken: the customer is likely to purchase (probability {probability:.1%}).")
+        st.success(f"Product Taken: the customer is likely to purchase")
     else:
-        st.warning(f"Product Not Taken: the customer is unlikely to purchase (probability {probability:.1%}).")
+        #st.warning(f"Product Not Taken: the customer is unlikely to purchase (probability {probability:.1%}).")
+        st.warning(f"Product Not Taken: the customer is unlikely to purchase ")

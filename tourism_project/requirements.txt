@@ -1,8 +1,5 @@
-PyGithub==2.9.1
 mlflow==3.0.1
-pyngrok==7.2.12
-pandas
+pandas==2.2.3
 scikit-learn==1.6.0
 xgboost==2.1.4
 joblib==1.5.1
-streamlit==1.43.2
